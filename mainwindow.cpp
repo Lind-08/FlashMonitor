@@ -24,7 +24,7 @@ wchar_t DriveMaskToLetter(int unitmask)
 
 GUID WceusbshGUID = { 0x25dbce51, 0x6c8f, 0x4a72,
                       0x8a,0x6d,0xb5,0x4c,0x2b,0x4f,0xc8,0x35 };
-GUID WceusbshGUID1 = { 0x53f5630d,0xb6bf,0x11d0,0x94,0xf2,0x00,0xa0,0xc9,0x1e,0xfb,0x8b };
+GUID ALL_USB_GUID = { 0x53f5630d,0xb6bf,0x11d0,0x94,0xf2,0x00,0xa0,0xc9,0x1e,0xfb,0x8b };
 
 
 BOOL DoRegisterDeviceInterfaceToHwnd(
@@ -55,11 +55,10 @@ BOOL DoRegisterDeviceInterfaceToHwnd(
 //     could be made from this template.
 {
     DEV_BROADCAST_DEVICEINTERFACE NotificationFilter;
-
     ZeroMemory(&NotificationFilter, sizeof(NotificationFilter));
     NotificationFilter.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
     NotificationFilter.dbcc_devicetype = DBT_DEVTYP_HANDLE;
-    NotificationFilter.dbcc_classguid = WceusbshGUID1;
+    NotificationFilter.dbcc_classguid = InterfaceClassGuid;
 
     *hDeviceNotify = RegisterDeviceNotification(
         hWnd,                       // events recipient
@@ -84,15 +83,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QAbstractNativeEventFilter()
 {
     QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
-
-    base = new UsbBase(this);
+    base = UsbBase::Instance();
     //connect(base, &UsbBase::newDevice, this, &MainWindow::newDevice);
     //connect(this, &MainWindow::newDeviceResult, base, &UsbBase::newDeviceResult);
     connect(this, &MainWindow::deviceArrived, base, &UsbBase::addUsbStorage);
-    //connect(this, &MainWindow::deviceRemoved, base, &UsbBase::removeUsbStorage);
+    connect(this, &MainWindow::deviceRemoved, base, &UsbBase::removeUsbStorage);
     this->hide();
     HDEVNOTIFY hDeviceNotify;
-    DoRegisterDeviceInterfaceToHwnd(WceusbshGUID1, reinterpret_cast<HWND>(this->winId()), &hDeviceNotify);
+    DoRegisterDeviceInterfaceToHwnd(ALL_USB_GUID, reinterpret_cast<HWND>(this->winId()), &hDeviceNotify);
 }
 
 MainWindow::~MainWindow()
@@ -105,9 +103,6 @@ void MainWindow::newDevice(UsbInfo *info)
     //QMessageBox::information(this,"Device arrived", "Device arrived", QMessageBox::Ok);
     //emit newDeviceResult(, info);
 }
-
-
-
 
 
 bool MainWindow::nativeEventFilter(const QByteArray &eventType, void *msg, long *result)

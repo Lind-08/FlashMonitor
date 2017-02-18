@@ -2,8 +2,10 @@
 #define TESTWINDOW_H
 
 #include <QMainWindow>
-#include <QSystemTrayIcon>
-#include <QCloseEvent>
+#include "windows.h"
+class QSystemTrayIcon;
+class QCloseEvent;
+
 class MainWindow;
 
 namespace Ui {
@@ -28,7 +30,8 @@ class testwindow : public QMainWindow
 public:
     explicit testwindow(QWidget *parent = 0);
     ~testwindow();
-
+public slots:
+    void onDeviceArrived(HANDLE ptr, QChar letter);
 private:
     Ui::testwindow *ui;
 };

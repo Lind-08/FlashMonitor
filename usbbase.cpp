@@ -36,6 +36,7 @@ void UsbBase::addUsbStorage(HANDLE handle, QChar letter)
     info->letter = letter;
     info->handle = handle;
     info->state = UsbState::empty;
+    emit deviceConnected(info);
     connectedDevices[letter] = info;
     UsbInfoFinder *finder = new UsbInfoFinder(this, info);
     connect(finder, &UsbInfoFinder::informationFinded, this, &UsbBase::informationFinded);
@@ -45,6 +46,7 @@ void UsbBase::addUsbStorage(HANDLE handle, QChar letter)
 void UsbBase::removeUsbStorage(QChar letter)
 {
     UsbInfo *info = connectedDevices[letter];
+    emit deviceDisconnected(info);
     unlockDevice(info);
 }
 
@@ -59,8 +61,10 @@ void UsbBase::unlockDevice(UsbInfo *info)
 void UsbBase::informationFinded(UsbInfoFinder *finder)
 {
     UsbInfo *info = finder->getInfo();
+    finder->deleteLater();
     if(checkInBase(info))
     {
+        emit deviceConnected(info);
         auto pair = getPair(info);
         if (pair.second)
         {

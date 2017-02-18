@@ -14,7 +14,6 @@ class UsbBase : public QObject
     static UsbBase *_instance;
     QHash<QChar,UsbInfo*> connectedDevices;
     QVector< QPair<UsbInfo*,bool> > base;
-private:
 
     bool checkInBase(UsbInfo *info);
     QPair<UsbInfo *, bool> getPair(UsbInfo* info);
@@ -22,6 +21,8 @@ private:
 
 signals:
     void newDevice(UsbInfo*);
+    void deviceConnected(UsbInfo*);
+    void deviceDisconnected(UsbInfo*);
 
 public:
     explicit UsbBase(QObject *parent = 0);

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,13 +17,17 @@ SOURCES += main.cpp\
     usbbase.cpp \
     usbinfo.cpp \
     usbinfofinder.cpp \
-    testwindow.cpp
+    testwindow.cpp \
+    usbclient.cpp \
+    myclient.cpp
 
 HEADERS  += mainwindow.h \
     usbbase.h \
     usbinfo.h \
     usbinfofinder.h \
-    testwindow.h
+    testwindow.h \
+    usbclient.h \
+    myclient.h
 
 FORMS += \
     testwindow.ui

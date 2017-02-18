@@ -1,18 +1,12 @@
 #include "myclient.h"
 
-void MyClient::sendMessage()
-{
-    _isWaitingAnswer = true;
-}
 
 MyClient::MyClient(QObject *parent) : QObject(parent)
 {
     socket = new QTcpSocket;
-    connect(socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error()));
     connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-    _isWaitingAnswer = false;
 }
 
 void MyClient::Send(QString message)
@@ -21,31 +15,39 @@ void MyClient::Send(QString message)
     stream << message;
 }
 
-void MyClient::Connect(QString address, quint16 port)
+bool MyClient::Connect(QString address, quint16 port)
 {
     if (!_status)
     {
         _address = address;
         _port = port;
         socket->connectToHost(_address, _port);
+        if (socket->waitForConnected())
+            return true;
     }
     else
     {
         QString msg = tr("Client has already connected");
         emit logMessage(msg);
+        return false;
     }
 }
 
 void MyClient::Disconnect()
 {
-    socket->close();
+    socket->disconnectFromHost();
+    if (socket->waitForDisconnected())
+        socket->close();
 }
 
-void MyClient::ReadyRead()
+QString MyClient::Read()
 {
-    QTextStream stream(socket);
-    QString message = stream.readAll();
-    emit recievedMessage(message);
+    if (socket->waitForReadyRead())
+    {
+        QTextStream stream(socket);
+        QString message = stream.readAll();
+        return message;
+    }
 }
 
 void MyClient::Error()

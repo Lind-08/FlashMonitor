@@ -8,7 +8,8 @@ enum class UsbState
     blocked,
     aborted,
     empty,
-    wait
+    wait,
+    apply
 };
 
 struct UsbInfo
