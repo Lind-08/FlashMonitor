@@ -6,6 +6,7 @@
 #include "usbinfofinder.h"
 #include <QHash>
 #include <QVector>
+#include "usbclient.h"
 
 class UsbBase : public QObject
 {
@@ -18,6 +19,8 @@ class UsbBase : public QObject
     bool checkInBase(UsbInfo *info);
     QPair<UsbInfo *, bool> getPair(UsbInfo* info);
     void unlockDevice(UsbInfo *info);
+
+    UsbClient *client;
 
 signals:
     void newDevice(UsbInfo*);

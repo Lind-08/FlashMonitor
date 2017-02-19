@@ -2,12 +2,16 @@
 #include <QThreadPool>
 #include <usbinfofinder.h>
 #include <QMessageBox>
+#include <QSettings>
 
 UsbBase* UsbBase::_instance;
 
 UsbBase::UsbBase(QObject *parent) : QObject(parent)
 {
-
+    QSettings settings("client.ini", QSettings::IniFormat);
+    client = new UsbClient(this);
+    client->setAddress(settings.value("server/address").toString());
+    client->setPort(settings.value("server/port").toInt());
 }
 
 bool UsbBase::checkInBase(UsbInfo *info)
