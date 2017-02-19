@@ -12,7 +12,7 @@ void UsbInfoFinder::run()
     infoObject->PID = info.PID;
     infoObject->VID = info.VID;
     infoObject->serial = info.serial;
-    infoObject->state = UsbState::wait;
+    infoObject->state = UsbState::full;
     emit informationFinded(this);
 }
 

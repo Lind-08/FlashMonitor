@@ -6,9 +6,8 @@
 enum class UsbState
 {
     blocked,
-    aborted,
     empty,
-    wait,
+    full,
     apply
 };
 

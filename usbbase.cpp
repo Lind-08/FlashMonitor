@@ -62,14 +62,17 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
 {
     UsbInfo *info = finder->getInfo();
     finder->deleteLater();
+    emit deviceConnected(info);
     if(checkInBase(info))
     {
-        emit deviceConnected(info);
         auto pair = getPair(info);
         if (pair.second)
         {
+            info->state = UsbState::apply;
             unlockDevice(info);
         }
+        info->state = UsbState::blocked;
+        emit deviceConnected(info);
     }
     else
     {

@@ -32,12 +32,12 @@ public:
         port = Port;
     }
 
-    QJsonObject ConnectToServer(QString secret, QString name);
-    QJsonObject GetRule(QString VID, QString PID);
-    QJsonObject GetRulesHash();
-    QJsonObject Disconnect();
 
 signals:
 
 public slots:
+    QJsonObject ConnectToServer(QString secret, QString name);
+    QJsonObject GetRule(QString VID, QString PID);
+    QJsonObject GetRulesHash();
+    QJsonObject Disconnect();
 };
