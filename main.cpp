@@ -7,10 +7,11 @@
 void loadSettings()
 {
     QSettings settings("client.ini", QSettings::IniFormat);
-    a.setProperty("address", settings.value("server/address"));
-    a.setProperty("port", settings.value("server/port"));
-    a.setProperty("secret", settings.value("client/secret"));
-    a.setProperty("name", settings.value("client/name"));
+    auto a = qApp;
+    a->setProperty("address", settings.value("server/address"));
+    a->setProperty("port", settings.value("server/port"));
+    a->setProperty("secret", settings.value("client/secret"));
+    a->setProperty("name", settings.value("client/name"));
 }
 
 

@@ -31,19 +31,27 @@ QJsonObject UsbClient::authenticate(QString secret, QString name)
     return answer;
 }
 
-UsbClient::UsbClient(QObject *parent) : QObject(parent)
+void UsbClient::on_clientStateChanged(bool state)
 {
-
+    isConnected = state;
 }
 
-QJsonObject UsbClient::ConnectToServer(QString secret, QString name)
+UsbClient::UsbClient(QObject *parent) : QObject(parent)
+{
+    client = new MyClient(this);
+    connect(client, &MyClient::changeStatus, this, &UsbClient::on_clientStateChanged);
+}
+
+QJsonObject UsbClient::ConnectToServer()
 {
     if (connectToServer(address, port))
     {
+        isConnected = true;
         return authenticate(secret, name);
     }
     else
     {
+        isConnected = false;
         QJsonObject answer;
         answer["code"] = "ERROR_CON";
         return answer;
@@ -72,6 +80,7 @@ QJsonObject UsbClient::GetRulesHash()
 
 QJsonObject UsbClient::Disconnect()
 {
+    isConnected = true;
     QJsonObject request;
     request["code"] = "BYE";
     send(request);

@@ -22,8 +22,8 @@ class UsbBase : public QObject
 
     UsbClient *client;
 
+    void newDevice(UsbInfo* info);
 signals:
-    void newDevice(UsbInfo*);
     void deviceConnected(UsbInfo*);
     void deviceDisconnected(UsbInfo*);
 

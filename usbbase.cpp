@@ -62,6 +62,11 @@ void UsbBase::unlockDevice(UsbInfo *info)
     connectedDevices.remove(info->letter);
 }
 
+void UsbBase::newDevice(UsbInfo *info)
+{
+
+}
+
 void UsbBase::informationFinded(UsbInfoFinder *finder)
 {
     UsbInfo *info = finder->getInfo();
@@ -80,7 +85,7 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
     }
     else
     {
-        emit newDevice(info);
+        newDevice(info);
     }
 }
 

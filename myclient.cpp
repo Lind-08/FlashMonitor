@@ -48,6 +48,8 @@ QString MyClient::Read()
         QString message = stream.readAll();
         return message;
     }
+    else
+        return QString();
 }
 
 void MyClient::Error()
