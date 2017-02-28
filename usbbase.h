@@ -26,6 +26,7 @@ class UsbBase : public QObject
 signals:
     void deviceConnected(UsbInfo*);
     void deviceDisconnected(UsbInfo*);
+    void error(QString);
 
 public:
     explicit UsbBase(QObject *parent = 0);

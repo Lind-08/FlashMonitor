@@ -22,14 +22,15 @@ public:
     ~MainWindow();
 
 public slots:
-    void newDevice(UsbInfo *info);
+    void StartMonitoring();
+    void StopMonitoring();
 
 private:
 
     /* This is where all the input to the window goes to */
 
     UsbBase *base;
-
+    HDEVNOTIFY hDeviceNotify;
     bool nativeEventFilter( QByteArray const& eventType, void* msg, long* result );
 
 signals:

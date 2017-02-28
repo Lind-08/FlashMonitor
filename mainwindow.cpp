@@ -82,15 +82,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     QAbstractNativeEventFilter()
 {
-    QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
     base = UsbBase::Instance();
     //connect(base, &UsbBase::newDevice, this, &MainWindow::newDevice);
     //connect(this, &MainWindow::newDeviceResult, base, &UsbBase::newDeviceResult);
     connect(this, &MainWindow::deviceArrived, base, &UsbBase::addUsbStorage);
     connect(this, &MainWindow::deviceRemoved, base, &UsbBase::removeUsbStorage);
     this->hide();
-    HDEVNOTIFY hDeviceNotify;
-    DoRegisterDeviceInterfaceToHwnd(ALL_USB_GUID, reinterpret_cast<HWND>(this->winId()), &hDeviceNotify);
+
 }
 
 MainWindow::~MainWindow()
@@ -98,10 +96,16 @@ MainWindow::~MainWindow()
     QAbstractEventDispatcher::instance()->removeNativeEventFilter(this);
 }
 
-void MainWindow::newDevice(UsbInfo *info)
+void MainWindow::StartMonitoring()
 {
-    //QMessageBox::information(this,"Device arrived", "Device arrived", QMessageBox::Ok);
-    //emit newDeviceResult(, info);
+    QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
+    DoRegisterDeviceInterfaceToHwnd(ALL_USB_GUID, reinterpret_cast<HWND>(this->winId()), &hDeviceNotify);
+}
+
+void MainWindow::StopMonitoring()
+{
+    UnregisterDeviceNotification(&hDeviceNotify);
+    QAbstractEventDispatcher::instance()->removeNativeEventFilter(this);
 }
 
 

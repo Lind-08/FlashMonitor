@@ -4,15 +4,17 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QJsonObject>
+#include <QApplication>
 
 UsbBase* UsbBase::_instance;
 
 UsbBase::UsbBase(QObject *parent) : QObject(parent)
 {
-    QSettings settings("client.ini", QSettings::IniFormat);
     client = new UsbClient(this);
-    client->setAddress(settings.value("server/address").toString());
-    client->setPort(settings.value("server/port").toInt());
+    client->setAddress(qApp->property("address").toString());
+    client->setPort(qApp->property("port").toInt());
+    client->setName(qApp->property("name").toString());
+    client->setSecret(qApp->property("secret").toString());
 }
 
 UsbInfo *UsbBase::getInfo(UsbInfo *info)
@@ -43,7 +45,8 @@ void UsbBase::removeUsbStorage(QChar letter)
 {
     UsbInfo *info = connectedDevices[letter];
     emit deviceDisconnected(info);
-    unlockDevice(info);
+    if (info != nullptr)
+        unlockDevice(info);
 }
 
 void UsbBase::unlockDevice(UsbInfo *info)
@@ -63,11 +66,14 @@ void UsbBase::addRule(UsbInfo *info)
 void UsbBase::newDevice(UsbInfo *info)
 {
     QString SUCCES_STRING = "SUCCES";
+    QString code;
     auto answ = client->ConnectToServer();
-    if (answ["code"].toString() == SUCCES_STRING)
+    code = answ["code"].toString();
+    if (code == SUCCES_STRING)
     {
         answ = client->GetRule(info->VID, info->PID);
-        if (answ["code"].toString() == SUCCES_STRING)
+        code = answ["code"].toString();
+        if (code == SUCCES_STRING)
         {
             if(answ["value"].toBool())
             {
@@ -79,13 +85,18 @@ void UsbBase::newDevice(UsbInfo *info)
             addRule(info);
             client->Disconnect();
         }
+        else
+            emit error(code);
     }
+    else
+        emit error(code);
 }
 
 void UsbBase::informationFinded(UsbInfoFinder *finder)
 {
     UsbInfo *info = finder->getInfo();
     finder->deleteLater();
+    info->state = UsbState::full;
     emit deviceConnected(info);
     auto newInfo = getInfo(info);
     if(newInfo != nullptr)
