@@ -9,6 +9,7 @@ class UsbClient : public QObject
 {
     Q_OBJECT
     MyClient *client;
+    bool isConnected;
     QString address;
     QString secret;
     QString name;
@@ -26,6 +27,11 @@ private slots:
 
 public:
     explicit UsbClient(QObject *parent = 0);
+
+    inline bool IsConnected()
+    {
+        return isConnected;
+    }
 
     inline void setAddress(QString Address)
     {

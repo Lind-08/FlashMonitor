@@ -17,7 +17,8 @@ QJsonObject UsbClient::recieve()
 
 bool UsbClient::connectToServer(QString address, quint32 port)
 {
-    return client->Connect(address,port);
+    isConnected = client->Connect(address,port);
+    return isConnected;
 }
 
 QJsonObject UsbClient::authenticate(QString secret, QString name)
