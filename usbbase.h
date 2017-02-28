@@ -14,12 +14,12 @@ class UsbBase : public QObject
     Q_OBJECT
     static UsbBase *_instance;
     QHash<QChar,UsbInfo*> connectedDevices;
-    QVector< QPair<UsbInfo*,bool> > base;
+    QVector< UsbInfo*> base;
 
-    bool checkInBase(UsbInfo *info);
-    QPair<UsbInfo *, bool> getPair(UsbInfo* info);
+
+    UsbInfo * getInfo(UsbInfo* info);
     void unlockDevice(UsbInfo *info);
-
+    void addRule(UsbInfo* info);
     UsbClient *client;
 
     void newDevice(UsbInfo* info);
@@ -42,7 +42,6 @@ public slots:
     void addUsbStorage(HANDLE handle, QChar letter);
     void removeUsbStorage(QChar letter);
     void informationFinded(UsbInfoFinder* finder);
-    void newDeviceResult(int result, UsbInfo *info);
 
 };
 

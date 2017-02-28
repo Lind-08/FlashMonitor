@@ -9,7 +9,6 @@ class UsbClient : public QObject
 {
     Q_OBJECT
     MyClient *client;
-    bool isConnected;
     QString address;
     QString secret;
     QString name;

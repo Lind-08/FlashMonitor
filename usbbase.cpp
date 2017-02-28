@@ -3,6 +3,7 @@
 #include <usbinfofinder.h>
 #include <QMessageBox>
 #include <QSettings>
+#include <QJsonObject>
 
 UsbBase* UsbBase::_instance;
 
@@ -14,23 +15,14 @@ UsbBase::UsbBase(QObject *parent) : QObject(parent)
     client->setPort(settings.value("server/port").toInt());
 }
 
-bool UsbBase::checkInBase(UsbInfo *info)
+UsbInfo *UsbBase::getInfo(UsbInfo *info)
 {
     foreach (auto item, base)
     {
-        if (item.first == info)
-            return true;
-    }
-    return false;
-}
-
-QPair<UsbInfo *, bool> UsbBase::getPair(UsbInfo *info)
-{
-    foreach (auto item, base)
-    {
-        if (item.first == info)
+        if (item->VID == info->VID && item->PID == info->PID)
             return item;
     }
+    return nullptr;
 }
 
 
@@ -62,9 +54,32 @@ void UsbBase::unlockDevice(UsbInfo *info)
     connectedDevices.remove(info->letter);
 }
 
+void UsbBase::addRule(UsbInfo *info)
+{
+    CloseHandle(info->handle);
+    base.append(info);
+}
+
 void UsbBase::newDevice(UsbInfo *info)
 {
-
+    QString SUCCES_STRING = "SUCCES";
+    auto answ = client->ConnectToServer();
+    if (answ["code"].toString() == SUCCES_STRING)
+    {
+        answ = client->GetRule(info->VID, info->PID);
+        if (answ["code"].toString() == SUCCES_STRING)
+        {
+            if(answ["value"].toBool())
+            {
+                info->state = UsbState::apply;
+                unlockDevice(info);
+            }
+            else
+                info->state = UsbState::blocked;
+            addRule(info);
+            client->Disconnect();
+        }
+    }
 }
 
 void UsbBase::informationFinded(UsbInfoFinder *finder)
@@ -72,10 +87,10 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
     UsbInfo *info = finder->getInfo();
     finder->deleteLater();
     emit deviceConnected(info);
-    if(checkInBase(info))
+    auto newInfo = getInfo(info);
+    if(newInfo != nullptr)
     {
-        auto pair = getPair(info);
-        if (pair.second)
+        if (newInfo->state == UsbState::apply)
         {
             info->state = UsbState::apply;
             unlockDevice(info);
@@ -85,24 +100,7 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
     }
     else
     {
+        info->state = UsbState::waited;
         newDevice(info);
-    }
-}
-
-void UsbBase::newDeviceResult(int result, UsbInfo * info)
-{
-    if (result != QMessageBox::Ignore)
-    {
-        QPair<UsbInfo*, bool> pair(info, true);
-        if (result == QDialog::Accepted)
-        {
-            base.append(pair);
-            unlockDevice(pair.first);
-        }
-        else
-        {
-            pair.second = false;
-            base.append(pair);
-        }
     }
 }

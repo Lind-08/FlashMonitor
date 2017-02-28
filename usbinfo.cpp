@@ -24,14 +24,13 @@ static QString FindDeviceKeyInMountedDevices(QChar letter)
 
 static QString GetDeviceStringForKey(QString key)
 {
-    LONG lResult;
     HKEY hKey;
-    lResult = RegOpenKeyEx (HKEY_LOCAL_MACHINE, L"SYSTEM\\MountedDevices", 0, KEY_READ, &hKey);
+    RegOpenKeyEx (HKEY_LOCAL_MACHINE, L"SYSTEM\\MountedDevices", 0, KEY_READ, &hKey);
     DWORD dType;
     DWORD dbData = 512;
     BYTE *data = new BYTE[512];
     ZeroMemory(data, 512);
-    lResult = RegQueryValueExA(hKey, key.toStdString().c_str(), 0, &dType, data, &dbData);
+    RegQueryValueExA(hKey, key.toStdString().c_str(), 0, &dType, data, &dbData);
     RegCloseKey(hKey);
     QString deviceString = QString::fromWCharArray(reinterpret_cast<wchar_t*>(data));
     return deviceString;
@@ -66,6 +65,7 @@ static QString GetIDString(QString serial)
             return item;
         }
     }
+    return QString();
 }
 
 static QString GetDeviceName(QString serial)
@@ -78,6 +78,7 @@ static QString GetDeviceName(QString serial)
             return reader.value(item).value<QString>();
         }
     }
+    return QString();
 }
 
 static UsbInfo ParceIDString(QString idString)

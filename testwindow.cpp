@@ -15,7 +15,8 @@ testwindow::testwindow(QWidget *parent) :
     trayIcon->show();
     detector = new MainWindow(this);
     auto base = UsbBase::Instance();
-    //connect(base, &UsbBase::newDevice, this, &testwindow::onDeviceArrived);
+    connect(base, &UsbBase::deviceConnected, this, &testwindow::onDeviceConnected);
+    connect(base, &UsbBase::deviceDisconnected, this, &testwindow::onDeviceDisconnected);
 }
 
 testwindow::~testwindow()
@@ -23,9 +24,31 @@ testwindow::~testwindow()
     delete ui;
 }
 
-void testwindow::onDeviceArrived(HANDLE ptr, QChar letter)
+void testwindow::onDeviceDisconnected(UsbInfo *info)
 {
-    trayIcon->showMessage("Новое устройство", "Подключено новое устройство. Получение информации об устройстве...");
+    trayIcon->showMessage("Устройство извлечено", QString("Подключено новое устройство. %1.").arg(info->name));
+}
+
+void testwindow::onError(QString error)
+{
+    trayIcon->showMessage("Ошибка", error, QSystemTrayIcon::Critical);
+}
+
+void testwindow::onDeviceConnected(UsbInfo *info)
+{
+    QString message;
+    if (info->state == UsbState::apply)
+    {
+        message = QString("Подключено новое устройство. %1. Доступ разрешен.").arg(info->name);
+    }
+    else
+    if (info->state == UsbState::blocked)
+    {
+         message = QString("Подключено новое устройство. %1. Доступ блокирован.").arg(info->name);
+    }
+    else
+        message = "Подключено новое устройство. Получение информации об устройстве...";
+    trayIcon->showMessage("Новое устройство", message);
 }
 
 void testwindow::createTrayActions()
