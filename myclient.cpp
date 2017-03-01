@@ -3,7 +3,7 @@
 
 MyClient::MyClient(QObject *parent) : QObject(parent)
 {
-    socket = new QTcpSocket;
+    socket = new QTcpSocket(this);
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error()));
     connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
@@ -25,12 +25,9 @@ bool MyClient::Connect(QString address, quint16 port)
         if (socket->waitForConnected())
             return true;
     }
-    else
-    {
-        QString msg = tr("Client has already connected");
-        emit logMessage(msg);
-        return false;
-    }
+    QString msg = tr("Client has already connected");
+    emit logMessage(msg);
+    return false;
 }
 
 void MyClient::Disconnect()

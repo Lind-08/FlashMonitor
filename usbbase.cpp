@@ -5,13 +5,14 @@
 #include <QSettings>
 #include <QJsonObject>
 #include <QApplication>
+#include <QHostAddress>
 
 UsbBase* UsbBase::_instance;
 
 UsbBase::UsbBase(QObject *parent) : QObject(parent)
 {
     client = new UsbClient(this);
-    client->setAddress(qApp->property("address").toString());
+    client->setAddress(QHostAddress(qApp->property("address").toString()).toString());
     client->setPort(qApp->property("port").toInt());
     client->setName(qApp->property("name").toString());
     client->setSecret(qApp->property("secret").toString());
@@ -59,7 +60,8 @@ void UsbBase::unlockDevice(UsbInfo *info)
 
 void UsbBase::addRule(UsbInfo *info)
 {
-    CloseHandle(info->handle);
+    if (info->state == UsbState::apply)
+        CloseHandle(info->handle);
     base.append(info);
 }
 
@@ -81,7 +83,9 @@ void UsbBase::newDevice(UsbInfo *info)
                 unlockDevice(info);
             }
             else
+            {
                 info->state = UsbState::blocked;
+            }
             addRule(info);
             client->Disconnect();
         }
@@ -97,7 +101,6 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
     UsbInfo *info = finder->getInfo();
     finder->deleteLater();
     info->state = UsbState::full;
-    emit deviceConnected(info);
     auto newInfo = getInfo(info);
     if(newInfo != nullptr)
     {
@@ -106,7 +109,8 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
             info->state = UsbState::apply;
             unlockDevice(info);
         }
-        info->state = UsbState::blocked;
+        else
+            info->state = UsbState::blocked;
         emit deviceConnected(info);
     }
     else
