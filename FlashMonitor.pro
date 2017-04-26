@@ -22,7 +22,15 @@ SOURCES += main.cpp\
     usbinfofinder.cpp \
     testwindow.cpp \
     usbclient.cpp \
-    myclient.cpp
+    myclient.cpp \
+    DB/dbfacade.cpp \
+    DB/host.cpp \
+    DB/hostrepository.cpp \
+    DB/rule.cpp \
+    DB/rulerepository.cpp \
+    DB/usb.cpp \
+    DB/usbbaseserver.cpp \
+    DB/usbrepository.cpp
 
 HEADERS  += mainwindow.h \
     usbbase.h \
@@ -30,10 +38,24 @@ HEADERS  += mainwindow.h \
     usbinfofinder.h \
     testwindow.h \
     usbclient.h \
-    myclient.h
+    myclient.h \
+    DB/basesqlrepository.h \
+    DB/dbfacade.h \
+    DB/host.h \
+    DB/hostrepository.h \
+    DB/irepository.h \
+    DB/property.h \
+    DB/rule.h \
+    DB/rulerepository.h \
+    DB/usb.h \
+    DB/usbbaseserver.h \
+    DB/usbrepository.h
 
 FORMS += \
     testwindow.ui
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    DB/schema.sql
