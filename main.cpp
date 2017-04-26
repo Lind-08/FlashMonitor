@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QMessageBox>
+#include "DB/dbfacade.h"
 
 
 bool loadSettings()
@@ -31,6 +32,11 @@ bool loadSettings()
             a->setProperty("name", settings.value("client/name"));
         else
             result = false;
+        if (settings.contains("db/path"))
+            a->setProperty("dbpath", settings.value("db/path"));
+        else
+            result = false;
+
         return result;
     }
 }
@@ -43,6 +49,22 @@ int main(int argc, char *argv[])
     {
         QMessageBox::critical(nullptr,"Ошибка","Не удалось загрузить настройки");
         return 0;
+    }
+    try
+    {
+        auto dbPath = a.property("dbpath").toString();
+        if (QFile::exists(dbpath))
+            DbFacade::InitDbFacade("QSQLITE", dbPath);
+        else
+        {
+            qDebug() << QObject::tr("Не найден файл базы данных");
+            return 0;
+        }
+    }
+    catch (std::exception &e)
+    {
+        qDebug() << QString(e.what());
+        return a.exec();
     }
     testwindow w;
     return a.exec();

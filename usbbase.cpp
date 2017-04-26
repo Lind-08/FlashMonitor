@@ -115,7 +115,7 @@ void UsbBase::informationFinded(UsbInfoFinder *finder)
     }
     else
     {
-        info->state = UsbState::blocked;
-        emit deviceConnected(info);
+        info->state = UsbState::waited;
+        emit newDevice(info);
     }
 }
