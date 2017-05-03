@@ -6,6 +6,10 @@
 #include <QJsonObject>
 #include <QApplication>
 #include <QHostAddress>
+#include "DB/usb.h"
+#include "DB/usbrepository.h"
+#include "DB/rule.h"
+#include "DB/rulerepository.h"
 
 UsbBase* UsbBase::_instance;
 
@@ -55,45 +59,36 @@ void UsbBase::unlockDevice(UsbInfo *info)
     DWORD byteReturned = 0;
     DeviceIoControl(info->handle, FSCTL_UNLOCK_VOLUME, 0, 0, 0, 0, &byteReturned,0);
     CloseHandle(info->handle);
-    connectedDevices.remove(info->letter);
+    //connectedDevices.remove(info->letter);
 }
 
 void UsbBase::addRule(UsbInfo *info)
 {
     if (info->state == UsbState::apply)
-        CloseHandle(info->handle);
+    {
+        unlockDevice(info);
+    }
     base.append(info);
 }
 
 void UsbBase::newDevice(UsbInfo *info)
 {
-    QString SUCCES_STRING = "SUCCES";
-    QString code;
-    auto answ = client->ConnectToServer();
-    code = answ["code"].toString();
-    if (code == SUCCES_STRING)
+    try
     {
-        answ = client->GetRule(info->VID, info->PID);
-        code = answ["code"].toString();
-        if (code == SUCCES_STRING)
-        {
-            if(answ["value"].toBool())
-            {
-                info->state = UsbState::apply;
-                unlockDevice(info);
-            }
-            else
-            {
-                info->state = UsbState::blocked;
-            }
-            addRule(info);
-            client->Disconnect();
-        }
+        auto usbRep = UsbRepository::Instance();
+        auto usb = usbRep->GetByVIDandPID(info->VID, info->PID);
+        auto ruleRep = RuleRepository::Instance();
+        auto rule = ruleRep->GetByUsb(usb).first();
+        if (rule->Value())
+            info->state = UsbState::apply;
         else
-            emit error(code);
+            info->state = UsbState::blocked;
+        addRule(info);
     }
-    else
-        emit error(code);
+    catch (...)
+    {
+        error("Бла бла бла");
+    }
 }
 
 void UsbBase::informationFinded(UsbInfoFinder *finder)

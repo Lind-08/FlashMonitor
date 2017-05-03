@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,7 +29,6 @@ SOURCES += main.cpp\
     DB/rule.cpp \
     DB/rulerepository.cpp \
     DB/usb.cpp \
-    DB/usbbaseserver.cpp \
     DB/usbrepository.cpp
 
 HEADERS  += mainwindow.h \
@@ -48,7 +47,6 @@ HEADERS  += mainwindow.h \
     DB/rule.h \
     DB/rulerepository.h \
     DB/usb.h \
-    DB/usbbaseserver.h \
     DB/usbrepository.h
 
 FORMS += \

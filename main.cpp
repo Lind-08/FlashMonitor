@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QMessageBox>
+#include <QDebug>
 #include "DB/dbfacade.h"
 
 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[])
     try
     {
         auto dbPath = a.property("dbpath").toString();
-        if (QFile::exists(dbpath))
+        if (QFile::exists(dbPath))
             DbFacade::InitDbFacade("QSQLITE", dbPath);
         else
         {
