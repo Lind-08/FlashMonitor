@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     DB/rule.cpp \
     DB/rulerepository.cpp \
     DB/usb.cpp \
-    DB/usbrepository.cpp
+    DB/usbrepository.cpp \
+    baseform.cpp
 
 HEADERS  += mainwindow.h \
     usbbase.h \
@@ -47,10 +48,12 @@ HEADERS  += mainwindow.h \
     DB/rule.h \
     DB/rulerepository.h \
     DB/usb.h \
-    DB/usbrepository.h
+    DB/usbrepository.h \
+    baseform.h
 
 FORMS += \
-    testwindow.ui
+    testwindow.ui \
+    baseform.ui
 
 RESOURCES += \
     resources.qrc
