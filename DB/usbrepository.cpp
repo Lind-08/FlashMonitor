@@ -104,3 +104,23 @@ Usb *UsbRepository::GetByVIDandPID(QString VID, QString PID)
     usb->setName(query->value(rec.indexOf("name")).toString());
     return usb;
 }
+
+Usb *UsbRepository::GetByID(int ID)
+{
+    QString queryString = QString("SELECT * FROM %1 WHERE id='%2';")\
+            .arg(TABLE_NAME).arg(ID);
+    auto query = execQueryWithResult(queryString);
+    qDebug() << query->lastError().text();
+    auto rec = query->record();
+    Usb *usb = Usb::Create();
+    if (query->size() == 0)
+        return usb;
+    if (!query->isValid())
+        query->next();
+    usb->setID(query->value(rec.indexOf("id")).toInt());
+    usb->setVID(query->value(rec.indexOf("VID")).toString());
+    usb->setPID(query->value(rec.indexOf("PID")).toString());
+    usb->setSerial(query->value(rec.indexOf("serial")).toString());
+    usb->setName(query->value(rec.indexOf("name")).toString());
+    return usb;
+}

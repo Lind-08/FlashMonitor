@@ -44,8 +44,8 @@ QList<Rule *> RuleRepository::getList(QString queryString)
             query->next();
         Rule *obj = Rule::Create();
         obj->setID(query->value(0).toInt());
-        obj->setUsb_ID(query->value(1).toInt());
-        obj->setHost_ID(query->value(2).toInt());
+        obj->setHost_ID(query->value(1).toInt());
+        obj->setUsb_ID(query->value(2).toInt());
         obj->setValue(query->value(3).toBool());
         result.push_back(obj);
     } while(query->next());

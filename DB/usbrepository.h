@@ -31,5 +31,7 @@ public:
     void Save(Usb *object);
     void Delete(Usb *object);
     Usb *GetByVIDandPID(QString VID, QString PID);
+    Usb *GetByID(int ID);
+
 };
 

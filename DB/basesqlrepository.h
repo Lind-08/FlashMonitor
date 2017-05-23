@@ -11,7 +11,7 @@ template <class T>
 class BaseSqlRepository : public IRepository<T>
 {
 protected:
-    const QString GET_ID_QUERY = "SELECT id FROM %1 ORDER BY id DESC;";
+    const QString GET_ID_QUERY = "SELECT * FROM %1 ORDER BY id DESC;";
 
     virtual QString getInsertQuery(T *object) = 0;
     virtual QString getUpdateQuery(T *object) = 0;
